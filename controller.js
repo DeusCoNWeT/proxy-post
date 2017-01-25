@@ -235,7 +235,10 @@
     getJsonFromJsonP(url, function (err, data) {
       if (!err && !data.error) {
         var quote = data.query.results.quote;
-
+        if (!(quote instanceof Array)){
+          quote = [quote];
+        }
+        log.debug(data.query.results.quote);
         // Load data from cache
         quote.forEach(function (enterprise, index) {
           var symbol = enterprise.symbol;
