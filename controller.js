@@ -165,7 +165,7 @@
   /************************* TRAFFIC **************************/
   // Traffic
   // Request to traffic
-  var makeTrafficRequest = function (stringMap, key, country, cb) {
+  var makeTrafficRequest = function (stringMap, key, cb) {
     var url = 'https://dev.virtualearth.net/REST/v1/Traffic/Incidents/' + stringMap;
     url += '?key=' + key + '&jsonp=Callback';
     log.debug('Request to ', url);
@@ -191,16 +191,15 @@
 
   // Traffic API
   Controller.prototype.getTraffic = function (req, res) {
-    // KEY,  MAP and Country are required
+    // KEY and MAP  are required
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     var stringMap = req.query.map || "";
     var key = req.query.key || "";
-    var country = req.query.country || "";
     if (!key || !stringMap) {
       res.status(400).send('Key and map param are required');
       return;
     }
-    makeTrafficRequest(stringMap, key, country, function (err, data) {
+    makeTrafficRequest(stringMap, key, function (err, data) {
       if (err) {
         res.status(400).send(err);
       } else {

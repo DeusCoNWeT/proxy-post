@@ -12,10 +12,10 @@ var routes = function(app, logger){
   app.post('/weather',ctrl.postWeather);
 
   // GET_FAKE
-  app.get('/:list/fakes', ctrl.getFake);
+  app.get('/fakes/:list', ctrl.getFake);
 
   // Clean Fake
-  app.get('/:list/fakes/clean', ctrl.cleanFake);
+  app.get('/fakes/:list/clean', ctrl.cleanFake);
 };
 
 module.exports = exports = routes;
