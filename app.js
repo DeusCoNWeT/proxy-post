@@ -4,7 +4,8 @@ var log4js = require('log4js');
 var fs = require('fs');
 var routes = require('./routes.js');
 var bodyParser = require('body-parser')
-
+var https = require('https');
+var http = require('http');
 //  Extend json
 function extend(target) {
     var sources = [].slice.call(arguments, 1);
@@ -45,8 +46,25 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
+// Enable https
+if (CONF.ssl_cert && CONF.ssl_cert) {
+  var options = {};
+  protocol = https;
+  options = {
+    key: fs.readFileSync(CONF.ssl_key),
+    cert: fs.readFileSync(CONF.ssl_cert),
+    requestCert:false,
+    rejectUnauthorized: false
+  };
+  http.createServer(options, app).listen(CONF.port, CONF.host, function(){
+  logger.info('Proxy working at port ' + CONF.port + ' over HTTPS');
+});
+} else {
+  app.listen(CONF.port, CONF.host, function(){
+    logger.info('Proxy working at port ' + CONF.port + ' over HTTP');
+  });
+}
+
 routes(app,logger);
 
-app.listen(CONF.port, CONF.host, function(){
-  logger.info('Proxy working at port ' + CONF.port);
-});
