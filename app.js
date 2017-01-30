@@ -57,7 +57,7 @@ if (CONF.ssl_cert && CONF.ssl_cert) {
     requestCert:false,
     rejectUnauthorized: false
   };
-  http.createServer(options, app).listen(CONF.port, CONF.host, function(){
+  https.createServer(options, app).listen(CONF.port, CONF.host, function(){
   logger.info('Proxy working at port ' + CONF.port + ' over HTTPS');
 });
 } else {
