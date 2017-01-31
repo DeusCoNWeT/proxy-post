@@ -168,10 +168,9 @@
   var makeTrafficRequest = function (stringMap, key, cb) {
     var url = 'https://dev.virtualearth.net/REST/v1/Traffic/Incidents/' + stringMap;
     url += '?key=' + key + '&jsonp=Callback';
-    log.debug('Request to ', url);
     getJsonFromJsonP(url, function (err, data) {
       if (!err) {
-        if (data && data.resourceSets && data.resourceSets[0].resources) {
+        if (data && data.resourceSets && data.resourceSets.length > 0 && data.resourceSets[0].resources) {
           log.debug('Tamaño inicial: ', data.resourceSets[0].resources.length);
           data.resourceSets[0].resources = data.resourceSets[0].resources.concat(DATA_CACHE.traffic);
           data.resourceSets[0].resources = data.resourceSets[0].resources.sort(function (issue1, issue2) {
@@ -183,7 +182,6 @@
           });
         }
       }
-      log.debug('Tamaño Final: ', data.resourceSets[0].resources.length);
       cb(err, data);
     });
 
