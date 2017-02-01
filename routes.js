@@ -5,6 +5,7 @@ var routes = function(app, logger){
   app.get('/traffic', ctrl.getTraffic);
   app.get('/stock', ctrl.getStock);
   app.get('/weather',ctrl.getWeather);
+  app.get('/company',ctrl.searchCompany);
 
   // POST
   app.post('/traffic', ctrl.postTraffic);
