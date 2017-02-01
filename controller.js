@@ -361,6 +361,23 @@
   };
 
 
+  // search company symbol
+  Controller.prototype.searchCompany = function(req, res) {
+    log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
+    var url = "http://chstocksearch.herokuapp.com/api/";
+    url += req.query.q;
+    request({url:url}, function(err, response, body){
+      if (err){
+        res.status(response.statusCode).send(err);
+      } else {
+        // Remove warning
+        body = JSON.parse(body);
+        body.pop();
+        res.status(response.statusCode).send(body);
+      }
+    });
+  };
+
   // Get fakes
 
   Controller.prototype.getFake = function (req, res) {
