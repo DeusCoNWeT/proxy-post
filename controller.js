@@ -168,10 +168,12 @@
   var makeTrafficRequest = function (stringMap, key, cb) {
     var url = 'https://dev.virtualearth.net/REST/v1/Traffic/Incidents/' + stringMap;
     url += '?key=' + key + '&jsonp=Callback';
+    log.info('Se pide el jsonp')
     getJsonFromJsonP(url, function (err, data) {
+      log.debug(err);
+      log.debug(data);
       if (!err) {
         if (data && data.resourceSets && data.resourceSets.length > 0 && data.resourceSets[0].resources) {
-          log.debug('Tamaño inicial: ', data.resourceSets[0].resources.length);
           data.resourceSets[0].resources = data.resourceSets[0].resources.concat(DATA_CACHE.traffic);
           data.resourceSets[0].resources = data.resourceSets[0].resources.sort(function (issue1, issue2) {
             // transform "//Date(xxx)  to xxx (integer)"
@@ -190,6 +192,7 @@
   // Traffic API
   Controller.prototype.getTraffic = function (req, res) {
     // KEY and MAP  are required
+    console.log('Log',log);
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     var stringMap = req.query.map || "";
     var key = req.query.key || "";
