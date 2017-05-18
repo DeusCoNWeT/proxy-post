@@ -1,5 +1,6 @@
 (function () {
   var request = require('request');
+  var csv = require('csvtojson');
   // Handler of JSONP request
   var getJsonFromJsonP = function (url, callback) {
     request(url, function (error, response, body) {
@@ -395,5 +396,37 @@
 
     res.status(200).send(deleted);
   };
+  Controller.prototype.getHistorical = function(req,res){
+    log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
+    var symbol = req.query.symbol;
+    var start_date = req.query.start_date;
+    var end_date = req.query.end_date;
+    if (!start_date || !end_date  || !symbol) {
+      res.status(400).send({error:"start_date, end_date and symbol must be defined"});
+      return;
+    }
+
+    var url = `https://www.google.com/finance/historical?`
+    var params = {
+      q: symbol,
+      histperiod:"daily",
+      startdate:start_date,
+      enddate:end_date,
+      output:"csv"
+    }
+    request({url:url,qs:params}, function(err, response, body){
+      if (err){
+        res.status(response.statusCode).send(err);
+        return;
+      }
+      var output = [];
+      csv().fromString(body).on('json',function(data){
+        data.Date = Date.parse(data.Date);
+        output.push(data);
+      }).on('done',function(){
+        res.status(200).send(output)
+      })
+    });
+  }
   module.exports = exports = Controller;
 })();
