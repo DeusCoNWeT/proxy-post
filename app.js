@@ -3,7 +3,7 @@ var express = require('express');
 var log4js = require('log4js');
 var fs = require('fs');
 var routes = require('./routes.js');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 var https = require('https');
 var http = require('http');
 //  Extend json

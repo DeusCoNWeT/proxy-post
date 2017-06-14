@@ -1,6 +1,8 @@
 (function () {
   var request = require('request');
   var csv = require('csvtojson');
+  var mixpanel = require('mixpanel');
+  var SECURITY_TOKEN = "fe8c2e7967c3f1ed91fd664de30333c6";
   // Handler of JSONP request
   var getJsonFromJsonP = function (url, callback) {
     request(url, function (error, response, body) {
@@ -38,7 +40,8 @@
   var DATA_CACHE = {
     "traffic": [],
     "stock": {},
-    "weather": []
+    "weather": [],
+    "security": {}
   }
   var Controller = function (app, logger) {
     app = app;
@@ -193,7 +196,7 @@
   // Traffic API
   Controller.prototype.getTraffic = function (req, res) {
     // KEY and MAP  are required
-    console.log('Log',log);
+    console.log('Log', log);
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     var stringMap = req.query.map || "";
     var key = req.query.key || "";
@@ -237,7 +240,7 @@
     getJsonFromJsonP(url, function (err, data) {
       if (!err && !data.error) {
         var quote = data.query.results.quote;
-        if (!(quote instanceof Array)){
+        if (!(quote instanceof Array)) {
           quote = [quote];
         }
         log.debug(data.query.results.quote);
@@ -366,12 +369,12 @@
 
 
   // search company symbol
-  Controller.prototype.searchCompany = function(req, res) {
+  Controller.prototype.searchCompany = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     var url = "http://chstocksearch.herokuapp.com/api/";
     url += req.query.q;
-    request({url:url}, function(err, response, body){
-      if (err){
+    request({ url: url }, function (err, response, body) {
+      if (err) {
         res.status(response.statusCode).send(err);
       } else {
         // Remove warning
@@ -399,37 +402,90 @@
 
     res.status(200).send(deleted);
   };
-  Controller.prototype.getHistorical = function(req,res){
+  Controller.prototype.getHistorical = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     var symbol = req.query.symbol;
     var start_date = req.query.start_date;
     var end_date = req.query.end_date;
-    if (!start_date || !end_date  || !symbol) {
-      res.status(400).send({error:"start_date, end_date and symbol must be defined"});
+    if (!start_date || !end_date || !symbol) {
+      res.status(400).send({ error: "start_date, end_date and symbol must be defined" });
       return;
     }
 
     var url = `https://www.google.com/finance/historical?`
     var params = {
       q: symbol,
-      histperiod:"daily",
-      startdate:start_date,
-      enddate:end_date,
-      output:"csv"
-    }
-    request({url:url,qs:params}, function(err, response, body){
-      if (err){
+      histperiod: "daily",
+      startdate: start_date,
+      enddate: end_date,
+      output: "csv"
+    };
+    request({ url: url, qs: params }, function (err, response, body) {
+      if (err) {
         res.status(response.statusCode).send(err);
         return;
       }
       var output = [];
-      csv().fromString(body).on('json',function(data){
+      csv().fromString(body).on('json', function (data) {
         data.Date = Date.parse(data.Date);
         output.push(data);
-      }).on('done',function(){
+      }).on('done', function () {
         res.status(200).send(output)
       })
     });
+  };
+
+  // Security measure
+  Controller.prototype.sendSecurity = function (req, res) {
+    log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
+    log.info(req.body);
+    if (!req.body.domain ||!req.body.results || !req.body.experiment_id) {
+      res.status(404).send({ error: "Experiment_id, domain and results are required" });
+      return;
+    }
+    var mix_security = mixpanel.init(SECURITY_TOKEN);
+    req.body.component_name = DATA_CACHE.security[req.body.experiment_id]
+
+    if (!req.body.component_name){
+      var error_info= {error: "Error: component_name must be set first using /security/experiment"};
+      log.error(error_info);
+      res.status(400).send(error);
+    }
+
+    mix_security.track(req.body.component_name, req.body, function(err){
+      if (err){
+        var error_info = {error:"Error sending data to mixpanel", body:req.body, origin:req.ip, err:err};
+        log.error(error_info);
+        res.status(404).send(error_info);
+        return;
+      }
+      log.info("Data sent to mixpanel:", req.body);
+      res.status(200).send();
+    });
+    
+  };
+  Controller.prototype.setIdComponent = function(req,res){
+    log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
+    log.info(req.body);
+
+    if (!req.body.component || !req.body.experiment_id){
+      log.error("Trying to set a component id withput component name or experiment id");
+      res.status(404).send();
+      return;
+    }
+    DATA_CACHE.security[req.body.experiment_id] = req.body.component;
+    res.status(200).send();
+  };
+
+  Controller.prototype.getComponentName = function(req, res){
+    log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
+    log.info(req.query);
+    var experiment_id = req.query.experiment_id;
+    if (!experiment_id){
+      res.status(404).send();
+      return ;
+    }
+    res.status(200).send({component_name: DATA_CACHE.security[experiment_id]});
   }
   module.exports = exports = Controller;
 })();
