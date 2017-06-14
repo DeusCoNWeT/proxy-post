@@ -17,6 +17,9 @@ var routes = function(app, logger){
 
   // Clean Fake
   app.get('/fakes/:list/clean', ctrl.cleanFake);
+
+  // Security
+  app.post('/security', ctrl.sendSecurity);
 };
 
 module.exports = exports = routes;

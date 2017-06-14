@@ -114,7 +114,7 @@
       // Set dt
       var next_hour = index * 3 * 3600 * 1000
       var current_date = new Date(base_date.getTime() + next_hour);// add 3 hour
-      new_weather.dt = Math.trunc(current_date.getTime() / 1000);
+      new_weather.dt = parseInt(current_date.getTime() / 1000,10);
       new_weather.dt_txt = current_date.toString();
 
       added.push(new_weather);
@@ -332,6 +332,8 @@
 
   Controller.prototype.postWeather = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
+    log.info('Datos que llegan:\n',req.body.data);
+    req.body.data = req.body.data.replace(/'/g,'"');
     var data = JSON.parse(req.body.data) || [];
     log.debug(data);
     // Check that 8 data have been sent
@@ -365,18 +367,18 @@
   };
 
 
-  // search company symbol
+  // search company symboli
   Controller.prototype.searchCompany = function(req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
-    var url = "http://chstocksearch.herokuapp.com/api/";
+    var url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?lang=es&region=US&query="
     url += req.query.q;
     request({url:url}, function(err, response, body){
       if (err){
         res.status(response.statusCode).send(err);
       } else {
         // Remove warning
+	log.info(body);
         body = JSON.parse(body);
-        body.pop();
         res.status(response.statusCode).send(body);
       }
     });
@@ -409,7 +411,7 @@
       return;
     }
 
-    var url = `https://www.google.com/finance/historical?`
+    var url = 'https://www.google.com/finance/historical'
     var params = {
       q: symbol,
       histperiod:"daily",
@@ -430,6 +432,11 @@
         res.status(200).send(output)
       })
     });
+  }
+  
+  Controller.prototype.sendSecurity = function(req, res) {
+   log.info(req.method + ' to ' + req.originalUrl + ' from ' + req.ip;
+   log.info(req.body); 
   }
   module.exports = exports = Controller;
 })();
