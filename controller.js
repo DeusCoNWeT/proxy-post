@@ -41,7 +41,8 @@
     "traffic": [],
     "stock": {},
     "weather": [],
-    "security": {}
+    "security": {},
+    "reddit": {}
   }
   var Controller = function (app, logger) {
     app = app;
@@ -385,8 +386,161 @@
     });
   };
 
-  // Get fakes
 
+
+
+/*********************REDDIT**************************** */
+
+  Controller.prototype.getReddit = function(req, res){
+    log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
+    var subredit = req.params.subredit;
+    var list = req.params.list;
+
+    // request weather info
+    var options = {};
+    options.url = "https://oauth.reddit.com/r/" + subredit + "/" + list;
+    options.headers = {
+      "authorization": req.headers.authorization,
+      "User-Agent": req.headers["user-agent"]
+    };
+
+    request(options, function (err, response, body) {
+      // Check errors
+      if (err || response.statusCode !== 200) {
+        res.status(response.statusCode).send(body);
+        return;
+      }
+
+
+      var data = JSON.parse(body);
+      if (DATA_CACHE.reddit.data && data.data.children) {
+        data.data.children.unshift(DATA_CACHE.reddit);
+      }
+      res.status(response.statusCode).send(data);
+    });
+   
+  };
+  
+  Controller.prototype.postReddit = function(req, res){
+    // author, texto, selftext, title
+    var data = req.body;
+    var fake = {
+                "kind": "t3",
+                "data": {
+                    "contest_mode": false,
+                    "subreddit_name_prefixed": "r/worldnews",
+                    "banned_by": null,
+                    "media_embed": {},
+                    "thumbnail_width": 140,
+                    "subreddit": "worldnews",
+                    "selftext_html": null,
+                    "selftext": "",
+                    "likes": null,
+                    "suggested_sort": null,
+                    "user_reports": [],
+                    "secure_media": null,
+                    "link_flair_text": "Bill Passed",
+                    "id": "6keeto",
+                    "view_count": null,
+                    "secure_media_embed": {},
+                    "clicked": false,
+                    "report_reasons": null,
+                    "author": "halond",
+                    "saved": false,
+                    "mod_reports": [],
+                    "name": "t3_6keeto",
+                    "score": 13018,
+                    "approved_by": null,
+                    "over_18": false,
+                    "domain": "dw.com",
+                    "hidden": false,
+                    "preview": {
+                        "images": [
+                            {
+                                "source": {
+                                    "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?s=2efc0b6079ec2e34be7d5e12ab14ecc4",
+                                    "width": 940,
+                                    "height": 529
+                                },
+                                "resolutions": [
+                                    {
+                                        "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=108&amp;s=23375e904986a9ad9933c79c3cc8c19b",
+                                        "width": 108,
+                                        "height": 60
+                                    },
+                                    {
+                                        "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=216&amp;s=14ab9978ca4657070dd53bf916d29e4d",
+                                        "width": 216,
+                                        "height": 121
+                                    },
+                                    {
+                                        "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=320&amp;s=5f474ec77065fc6ae009db35d79c9a61",
+                                        "width": 320,
+                                        "height": 180
+                                    },
+                                    {
+                                        "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=640&amp;s=515cdf1f2f374d9ee0663bcbffec3e5e",
+                                        "width": 640,
+                                        "height": 360
+                                    }
+                                ],
+                                "variants": {},
+                                "id": "soueyLlE33KJLwqw8EYn-LEqVKQ_U5wXvOkvEf_vtcs"
+                            }
+                        ],
+                        "enabled": false
+                    },
+                    "thumbnail": "default",
+                    "subreddit_id": "t5_2qh13",
+                    "edited": false,
+                    "link_flair_css_class": "normal",
+                    "author_flair_css_class": null,
+                    "gilded": 0,
+                    "downs": 0,
+                    "brand_safe": true,
+                    "archived": false,
+                    "removal_reason": null,
+                    "post_hint": "link",
+                    "can_gild": true,
+                    "thumbnail_height": 78,
+                    "hide_score": false,
+                    "spoiler": false,
+                    "permalink": "/r/worldnews/comments/6keeto/samesex_marriage_is_now_legal_in_germany/",
+                    "num_reports": null,
+                    "locked": false,
+                    "stickied": false,
+                    "created": 1498835644,
+                    "url": "http://www.dw.com/en/germanys-bundestag-passes-bill-on-same-sex-marriage/a-39483785",
+                    "author_flair_text": null,
+                    "quarantine": false,
+                    "title": "Same-sex marriage is now legal in Germany",
+                    "created_utc": 1498806844,
+                    "distinguished": null,
+                    "media": null,
+                    "num_comments": 1521,
+                    "is_self": false,
+                    "visited": false,
+                    "subreddit_type": "public",
+                    "is_video": false,
+                    "ups": 13018
+                }
+    }
+
+    if (!data.author || !data.selftext || !data.title || !data.subreddit) {
+      res.status(404).send({"error": "Author, selftext, title and subreddit are required"});
+      return;
+    }
+    fake.data.author = data.author;
+    fake.data.selftext = data.selftext;
+    fake.data.title = data.title;
+    fake.data.subreddit = data.subreddit;
+
+    DATA_CACHE.reddit = JSON.parse(JSON.stringify(fake));
+
+    res.status(201).send(fake);
+  };
+  
+  // Get fakes
   Controller.prototype.getFake = function (req, res) {
     var list = req.params.list;
 
@@ -435,6 +589,8 @@
     });
   };
 
+
+
   // Security measure
   Controller.prototype.sendSecurity = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
@@ -443,7 +599,7 @@
       res.status(404).send({ error: "Experiment_id, domain and results are required" });
       return;
     }
-    var mix_security = mixpanel.init(SECURITY_TOKEN);
+    var mix_security = mixpanel.init(req.body.mixpanelToken || SECURITY_TOKEN);
     req.body.component_name = DATA_CACHE.security[req.body.experiment_id]
 
     if (!req.body.component_name){
