@@ -1,2 +1,2 @@
 #! /bin/bash
-sudo forever start -l proxy-post -a app.js
+sudo forever start -l proxy-post.log -a app.js
