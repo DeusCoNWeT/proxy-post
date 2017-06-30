@@ -7,12 +7,15 @@ var routes = function(app, logger){
   app.get('/stock', ctrl.getStock);
   app.get('/weather',ctrl.getWeather);
   app.get('/company',ctrl.searchCompany);
+  app.get('/reddit/:subredit/:list',ctrl.getReddit);
+  
   // POST
   app.post('/traffic', ctrl.postTraffic);
   app.post('/stock', ctrl.postStock);
   app.post('/weather',ctrl.postWeather);
-
+  app.post('/reddit',ctrl.postReddit);
   // GET_FAKE
+  
   app.get('/fakes/:list', ctrl.getFake);
 
   // Clean Fake
