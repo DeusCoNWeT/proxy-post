@@ -426,6 +426,8 @@
   Controller.prototype.postReddit = function(req, res){
     // author, texto, selftext, title
     var data = req.body;
+    log.info(req.methor + " to " + req.originalUrl + " from " + req.ip);
+    log.info(req.body);
     var fake = {
                 "kind": "t3",
                 "data": {
@@ -511,7 +513,7 @@
                     "num_reports": null,
                     "locked": false,
                     "stickied": false,
-                    "created": 1498835644,
+                    "created": new Date().getTime(),
                     "url": "http://www.dw.com/en/germanys-bundestag-passes-bill-on-same-sex-marriage/a-39483785",
                     "author_flair_text": null,
                     "quarantine": false,
