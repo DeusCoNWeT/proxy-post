@@ -28,7 +28,8 @@ CONF = extend({},DEFAULT_SETTINGS, CONF_FILE);
 
 // Config logger
 if (CONF.log_file){
-  log4js.loadAppender(CONF.log_file);
+  log4js.loadAppender('file');
+  log4js.addAppender(log4js.appenders.file(CONF.log_file),'app');
 }
 var logger = log4js.getLogger('app');
 logger.setLevel(CONF.log_level);
