@@ -8,5 +8,5 @@ services:
       - /etc/letsencrypt/live/centauro.ls.fi.upm.es/privkey.pem:/proxy/ssl/key.pem
       - /home/miguel/proxy-post-logs/:/proxy/logs
     ports:
-      - 4444:4444
+      - 4444:3000
     command: [ "node", "app.js" ]

@@ -3,6 +3,20 @@
 Proxy intermediario entre las peticiones de los componentes de stock, weather y traffic. Permite
 postear datos y almacenarlos en una cache. Solo se almacena un dato.
 
+## Configuración
+
+El proxy permite ser configurado a través de variables de entornos o del fichero del configuración. En caso de utilizar
+variables de entorno, los nombres irán en mayusculas
+
+| Variable  | Descripción                                              | Default             |
+|-----------|----------------------------------------------------------|---------------------|
+| port      | Puerto en el que va a ejecutar la aplicación             | 8080                |
+| log_level | Nivel de logs que se van a registrar (DEBUG,INFO,ERROR)  | info                |
+| host      | Dirección host que se utiliza al desplegar la aplicación | localhost           |
+| log_file  | Fichero donde se guardará los logs de la aplicación      | logs/proxy-post.log |
+| ssl_key   | Fichero de la clave para el certificado ssl para HTTPS   |                     |
+| ssl_cert  | Fichero del certificado ssl para HTTPS                   |                     |
+
 ## Peticiones Genericas
 
 ### GET /fakes/:list

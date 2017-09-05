@@ -20,9 +20,12 @@ function extend(target) {
 // Set conf files
 var CONF_FILE = fs.existsSync('config.json') ? JSON.parse(fs.readFileSync('config.json', 'utf8')) : {};
 var DEFAULT_SETTINGS = {
-  "port": "8080",
-  "host":"localhost",
-  "log_level": "info",
+  "port": process.env.PORT || "8080",
+  "host": process.env.HOST || "localhost",
+  "log_level": process.env.LOG_LEVEL || "info",
+  "ssl_cert" : process.env.SSL_CERT | "",
+  "ssl_key" : process.env.SSL_KEY | "",
+  "log_file": process.env.LOG_FILE | "logs/proxy-post.log"
 };
 CONF = extend({},DEFAULT_SETTINGS, CONF_FILE);
 
@@ -49,7 +52,7 @@ app.use(function(req, res, next) {
 });
 
 // Enable https
-if (CONF.ssl_cert && CONF.ssl_cert) {
+if (CONF.ssl_cert && CONF.ssl_key) {
   var options = {};
   protocol = https;
   options = {
