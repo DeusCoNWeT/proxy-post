@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  proxy:
+    image: 'deus/proxy-post'
+    volumes:
+      - /etc/letsencrypt/live/centauro.ls.fi.upm.es/cert.pem:/proxy/ssl/cert.pem
+      - /etc/letsencrypt/live/centauro.ls.fi.upm.es/privkey.pem:/proxy/ssl/key.pem
+      - /home/miguel/proxy-post-logs/:/proxy/logs
+    ports:
+      - 4444:4444
+    restart: always
+    command: [ "node", "app.js" ]
+  private-bower:
+    image: 'tandrup/private-bower'
+    ports:
+      - 5555:5678
+      - 6789:6789
+      - 7891:7891
+    restart: always
+    volumes:
+      - ./data:/data
+  picbit:
+    image: 'deus/picbit'
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      #- etc/letsencrypt/live/centauro.ls.fi.upm.es:/app/ssl
+      - /home/miguel/DeusCoNWeT:/app
+      - /home/miguel/logs/picbit:/logs
+    restart: always
+    command: ['bash', '/app/server_config/init.sh']
+
