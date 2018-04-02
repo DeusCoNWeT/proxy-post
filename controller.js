@@ -378,14 +378,21 @@
   // search company symbol
   Controller.prototype.searchCompany = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
-    var url ="https://finance.google.com/finance/match?matchtype=matchall&q="
+    var url ="https://www.google.com/complete/search?client=finance-immersive&xhr=t&q="
     url += req.query.q;
     request({ url: url }, function (err, response, body) {
       if (err) {
         res.status(response.statusCode).send(err);
       } else {
         body = JSON.parse(body);
-        res.status(response.statusCode).send(body);
+        var comp = [];
+        body[1].forEach(function(el){
+          if (el.length>3){
+            comp.push(el[3]);
+          }
+        });
+
+        res.status(response.statusCode).send({search: comp});
       }
     });
   };

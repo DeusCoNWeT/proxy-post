@@ -4,9 +4,10 @@ services:
   proxy:
     image: 'deus/proxy-post'
     volumes:
-      - /etc/letsencrypt/live/centauro.ls.fi.upm.es/cert.pem:/proxy/ssl/cert.pem
-      - /etc/letsencrypt/live/centauro.ls.fi.upm.es/privkey.pem:/proxy/ssl/key.pem
-      - /home/miguel/proxy-post-logs/:/proxy/logs
+      - /home/miguel/ssl/centauro_ls_etsiinf_upm_es.crt:/proxy/ssl/ssl.crt
+      - /home/miguel/ssl/centauro_ls_etsiinf_upm_es.key:/proxy/ssl/ssl.key
+      - /home/miguel/ssl/DigiCertCA.crt:/proxy/ssl/ca.crt
+      - /home/miguel/logs/proxy/:/proxy/logs
     ports:
       - 4444:4444
     command: [ "node", "app.js" ]

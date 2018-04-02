@@ -2,8 +2,8 @@
   "port": "4444",
   "log_level": "info",
   "host": "0.0.0.0",
-  "ssl_key": "./ssl/ssl.key",
-  "ssl_cert": "./ssl/ssl.crt",
-  "ca": "./ssl/ca.crt",
-  "pwd": "my-password"
+  "ssl_key": "/home/miguel/ssl/centauro_ls_etsiinf_upm_es.crt",
+  "ssl_cert": "/home/miguel/ssl/centauro_ls_etsiinf_upm_es.key",
+  "ca": "/home/miguel/ssl/DigiCertCA.crt",
+  "pwd": "21f9g1241b153cfd"
 }
