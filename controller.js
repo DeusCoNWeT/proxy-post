@@ -282,7 +282,7 @@
           res.status(400).send(err || data);
           return;
         }
-        res.status(200).send(data);
+        res.status(200).send(data[0]);
       });
     }
   };
