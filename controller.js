@@ -118,7 +118,7 @@
       // Set dt
       var next_hour = index * 3 * 3600 * 1000
       var current_date = new Date(base_date.getTime() + next_hour);// add 3 hour
-      new_weather.dt = parseInt(current_date.getTime() / 1000,10);
+      new_weather.dt = parseInt(current_date.getTime() / 1000, 10);
       new_weather.dt_txt = current_date.toString();
 
       added.push(new_weather);
@@ -236,12 +236,11 @@
   // Stock
 
   var makeStockRequest = function (symbol, cb) {
-    var url = 'https://finance.google.com/finance/historical'
+    var url = 'https://www.alphavantage.co/query';
     var params = {
-      q: symbol,
-      output: "csv",
-      histperiod: "daily",
-      startdate: new Date(new Date() - 60*60*24*1000)
+      function: 'TIME_SERIES_DAILY',
+      apikey: 'T05EU5YA98ARE5EB',
+      symbol: symbol
     };
 
     request({ uri: url, qs: params }, function (err, response, body) {
@@ -249,21 +248,34 @@
         log.info(err);
         cb(err, null);
       } else {
-        var output = {};
-        csv().fromString(body).on('json', function (data) {
-          data.Date = Date.parse(data.Date);
-          output = data;
-        }).on('done', function () {
-          !output.Date ? cb(body, null): cb(null, output);
-        }.bind(this))
+        body = JSON.parse(body);
+        if (body["Error Message"]){
+          cb(body, null);
+        } else{
+          var data = [];
+          var ref=body["Time Series (Daily)"];
+          for (date in ref){
+            var info = {
+              Open: ref[date]["1. open"],
+              High: ref[date]["2. high"],
+              Low: ref[date]["3. low"],
+              Close: ref[date]["4. close"],
+              Volume: ref[date]["5. volume"],
+              Date: date,
+              Symbol: symbol
+            };
+            data.push(info)
+          }
+          cb(null, data);
+        }
       }
     });
   };
 
   Controller.prototype.getStock = function (req, res) {
     log.info(req.method + " to " + decodeURIComponent(req.originalUrl) + " from " + req.ip);
-    if (!req.query.symbol){
-      res.status(400).send({error: "Symbol is required"})
+    if (!req.query.symbol) {
+      res.status(400).send({ error: "Symbol is required" })
     } else {
       makeStockRequest(req.query.symbol, function (err, data) {
         if (err || data.error) {
@@ -340,8 +352,8 @@
 
   Controller.prototype.postWeather = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
-    log.info('Datos que llegan:\n',req.body.data);
-    req.body.data = req.body.data.replace(/'/g,'"');
+    log.info('Datos que llegan:\n', req.body.data);
+    req.body.data = req.body.data.replace(/'/g, '"');
     var data = JSON.parse(req.body.data) || [];
     log.debug(data);
     // Check that 8 data have been sent
@@ -378,7 +390,7 @@
   // search company symbol
   Controller.prototype.searchCompany = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
-    var url ="https://www.google.com/complete/search?client=finance-immersive&xhr=t&q="
+    var url = "https://www.google.com/complete/search?client=finance-immersive&xhr=t&q="
     url += req.query.q;
     request({ url: url }, function (err, response, body) {
       if (err) {
@@ -386,13 +398,13 @@
       } else {
         body = JSON.parse(body);
         var comp = [];
-        body[1].forEach(function(el){
-          if (el.length>3){
+        body[1].forEach(function (el) {
+          if (el.length > 3) {
             comp.push(el[3]);
           }
         });
 
-        res.status(response.statusCode).send({search: comp});
+        res.status(response.statusCode).send({ search: comp });
       }
     });
   };
@@ -400,9 +412,9 @@
 
 
 
-/*********************REDDIT**************************** */
+  /*********************REDDIT**************************** */
 
-  Controller.prototype.getReddit = function(req, res){
+  Controller.prototype.getReddit = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     var subredit = req.params.subredit;
     var list = req.params.list;
@@ -429,118 +441,118 @@
       }
       res.status(response.statusCode).send(data);
     });
-   
+
   };
-  
-  Controller.prototype.postReddit = function(req, res){
+
+  Controller.prototype.postReddit = function (req, res) {
     // author, texto, selftext, title
     var data = req.body;
     log.info(req.methor + " to " + req.originalUrl + " from " + req.ip);
     log.info(req.body);
     var fake = {
-                "kind": "t3",
-                "data": {
-                    "contest_mode": false,
-                    "subreddit_name_prefixed": "r/worldnews",
-                    "banned_by": null,
-                    "media_embed": {},
-                    "thumbnail_width": 140,
-                    "subreddit": "worldnews",
-                    "selftext_html": null,
-                    "selftext": "",
-                    "likes": null,
-                    "suggested_sort": null,
-                    "user_reports": [],
-                    "secure_media": null,
-                    "link_flair_text": "Bill Passed",
-                    "id": "6keeto",
-                    "view_count": null,
-                    "secure_media_embed": {},
-                    "clicked": false,
-                    "report_reasons": null,
-                    "author": "halond",
-                    "saved": false,
-                    "mod_reports": [],
-                    "name": "t3_6keeto",
-                    "score": 13018,
-                    "approved_by": null,
-                    "over_18": false,
-                    "domain": "dw.com",
-                    "hidden": false,
-                    "preview": {
-                        "images": [
-                            {
-                                "source": {
-                                    "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?s=2efc0b6079ec2e34be7d5e12ab14ecc4",
-                                    "width": 940,
-                                    "height": 529
-                                },
-                                "resolutions": [
-                                    {
-                                        "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=108&amp;s=23375e904986a9ad9933c79c3cc8c19b",
-                                        "width": 108,
-                                        "height": 60
-                                    },
-                                    {
-                                        "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=216&amp;s=14ab9978ca4657070dd53bf916d29e4d",
-                                        "width": 216,
-                                        "height": 121
-                                    },
-                                    {
-                                        "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=320&amp;s=5f474ec77065fc6ae009db35d79c9a61",
-                                        "width": 320,
-                                        "height": 180
-                                    },
-                                    {
-                                        "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=640&amp;s=515cdf1f2f374d9ee0663bcbffec3e5e",
-                                        "width": 640,
-                                        "height": 360
-                                    }
-                                ],
-                                "variants": {},
-                                "id": "soueyLlE33KJLwqw8EYn-LEqVKQ_U5wXvOkvEf_vtcs"
-                            }
-                        ],
-                        "enabled": false
-                    },
-                    "thumbnail": "default",
-                    "subreddit_id": "t5_2qh13",
-                    "edited": false,
-                    "link_flair_css_class": "normal",
-                    "author_flair_css_class": null,
-                    "gilded": 0,
-                    "downs": 0,
-                    "brand_safe": true,
-                    "archived": false,
-                    "removal_reason": null,
-                    "post_hint": "link",
-                    "can_gild": true,
-                    "thumbnail_height": 78,
-                    "hide_score": false,
-                    "spoiler": false,
-                    "permalink": "/r/worldnews/comments/6keeto/samesex_marriage_is_now_legal_in_germany/",
-                    "num_reports": null,
-                    "locked": false,
-                    "stickied": false,
-                    "created": new Date().getTime(),
-                    "url": "http://www.dw.com/en/germanys-bundestag-passes-bill-on-same-sex-marriage/a-39483785",
-                    "author_flair_text": null,
-                    "quarantine": false,
-                    "title": "Same-sex marriage is now legal in Germany",
-                    "created_utc": 1498806844,
-                    "distinguished": null,
-                    "media": null,
-                    "num_comments": 1521,
-                    "is_self": false,
-                    "visited": false,
-                    "subreddit_type": "public",
-                    "is_video": false,
-                    "ups": 13018
+      "kind": "t3",
+      "data": {
+        "contest_mode": false,
+        "subreddit_name_prefixed": "r/worldnews",
+        "banned_by": null,
+        "media_embed": {},
+        "thumbnail_width": 140,
+        "subreddit": "worldnews",
+        "selftext_html": null,
+        "selftext": "",
+        "likes": null,
+        "suggested_sort": null,
+        "user_reports": [],
+        "secure_media": null,
+        "link_flair_text": "Bill Passed",
+        "id": "6keeto",
+        "view_count": null,
+        "secure_media_embed": {},
+        "clicked": false,
+        "report_reasons": null,
+        "author": "halond",
+        "saved": false,
+        "mod_reports": [],
+        "name": "t3_6keeto",
+        "score": 13018,
+        "approved_by": null,
+        "over_18": false,
+        "domain": "dw.com",
+        "hidden": false,
+        "preview": {
+          "images": [
+            {
+              "source": {
+                "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?s=2efc0b6079ec2e34be7d5e12ab14ecc4",
+                "width": 940,
+                "height": 529
+              },
+              "resolutions": [
+                {
+                  "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=108&amp;s=23375e904986a9ad9933c79c3cc8c19b",
+                  "width": 108,
+                  "height": 60
+                },
+                {
+                  "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=216&amp;s=14ab9978ca4657070dd53bf916d29e4d",
+                  "width": 216,
+                  "height": 121
+                },
+                {
+                  "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=320&amp;s=5f474ec77065fc6ae009db35d79c9a61",
+                  "width": 320,
+                  "height": 180
+                },
+                {
+                  "url": "https://i.redditmedia.com/9J6rBxecnx8I6EZB_zZbM6g8y2u5smP2TxV3uy3g3gg.jpg?fit=crop&amp;crop=faces%2Centropy&amp;arh=2&amp;w=640&amp;s=515cdf1f2f374d9ee0663bcbffec3e5e",
+                  "width": 640,
+                  "height": 360
                 }
+              ],
+              "variants": {},
+              "id": "soueyLlE33KJLwqw8EYn-LEqVKQ_U5wXvOkvEf_vtcs"
+            }
+          ],
+          "enabled": false
+        },
+        "thumbnail": "default",
+        "subreddit_id": "t5_2qh13",
+        "edited": false,
+        "link_flair_css_class": "normal",
+        "author_flair_css_class": null,
+        "gilded": 0,
+        "downs": 0,
+        "brand_safe": true,
+        "archived": false,
+        "removal_reason": null,
+        "post_hint": "link",
+        "can_gild": true,
+        "thumbnail_height": 78,
+        "hide_score": false,
+        "spoiler": false,
+        "permalink": "/r/worldnews/comments/6keeto/samesex_marriage_is_now_legal_in_germany/",
+        "num_reports": null,
+        "locked": false,
+        "stickied": false,
+        "created": new Date().getTime(),
+        "url": "http://www.dw.com/en/germanys-bundestag-passes-bill-on-same-sex-marriage/a-39483785",
+        "author_flair_text": null,
+        "quarantine": false,
+        "title": "Same-sex marriage is now legal in Germany",
+        "created_utc": 1498806844,
+        "distinguished": null,
+        "media": null,
+        "num_comments": 1521,
+        "is_self": false,
+        "visited": false,
+        "subreddit_type": "public",
+        "is_video": false,
+        "ups": 13018
+      }
     }
 
     if (!data.author || !data.selftext || !data.title || !data.subreddit) {
-      res.status(404).send({"error": "Author, selftext, title and subreddit are required"});
+      res.status(404).send({ "error": "Author, selftext, title and subreddit are required" });
       return;
     }
     fake.data.author = data.author;
@@ -552,7 +564,7 @@
 
     res.status(201).send(fake);
   };
-  
+
   // Get fakes
   Controller.prototype.getFake = function (req, res) {
     var list = req.params.list;
@@ -570,37 +582,18 @@
     res.status(200).send(deleted);
   };
   Controller.prototype.getHistorical = function (req, res) {
-    log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
-    var symbol = req.query.symbol;
-    var start_date = req.query.start_date;
-    var end_date = req.query.end_date;
-    if ( (start_date && !end_date) || !symbol) {
-      res.status(400).send({ error: "start_date, end_date and symbol must be defined" });
-      return;
+    log.info(req.method + " to " + decodeURIComponent(req.originalUrl) + " from " + req.ip);
+    if (!req.query.symbol) {
+      res.status(400).send({ error: "Symbol is required" })
+    } else {
+      makeStockRequest(req.query.symbol, function (err, data) {
+        if (err || data.error) {
+          res.status(400).send(err || data);
+          return;
+        }
+        res.status(200).send(data);
+      });
     }
-    if (!start_date) start_date= new Date();
-    if (!end_date) end_date= new Date();
-    var url = 'https://finance.google.com/finance/historical'
-    var params = {
-      q: symbol,
-      histperiod: "daily",
-      startdate: start_date,
-      enddate: end_date,
-      output: "csv"
-    };
-    request({ url: url, qs: params }, function (err, response, body) {
-      if (err) {
-        res.status(400).send(err);
-        return;
-      }
-      var output = [];
-      csv().fromString(body).on('json', function (data) {
-        data.Date = Date.parse(data.Date);
-        output.push(data);
-      }).on('done', function () {
-        res.status(200).send(output)
-      })
-    });
   };
 
 
@@ -609,22 +602,22 @@
   Controller.prototype.sendSecurity = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     log.info(req.body);
-    if (!req.body.domain ||!req.body.results || !req.body.experiment_id) {
+    if (!req.body.domain || !req.body.results || !req.body.experiment_id) {
       res.status(404).send({ error: "Experiment_id, domain and results are required" });
       return;
     }
     var mix_security = mixpanel.init(req.body.mixpanelToken || SECURITY_TOKEN);
     req.body.component_name = DATA_CACHE.security[req.body.experiment_id]
 
-    if (!req.body.component_name){
-      var error_info= {error: "Error: component_name must be set first using /security/experiment"};
+    if (!req.body.component_name) {
+      var error_info = { error: "Error: component_name must be set first using /security/experiment" };
       log.error(error_info);
       res.status(400).send(error_info);
     }
 
-    mix_security.track(req.body.component_name, req.body, function(err){
-      if (err){
-        var error_info = {error:"Error sending data to mixpanel", body:req.body, origin:req.ip, err:err};
+    mix_security.track(req.body.component_name, req.body, function (err) {
+      if (err) {
+        var error_info = { error: "Error sending data to mixpanel", body: req.body, origin: req.ip, err: err };
         log.error(error_info);
         res.status(404).send(error_info);
         return;
@@ -632,13 +625,13 @@
       log.info("Data sent to mixpanel:", req.body);
       res.status(200).send();
     });
-    
+
   };
-  Controller.prototype.setIdComponent = function(req,res){
+  Controller.prototype.setIdComponent = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     log.info(req.body);
 
-    if (!req.body.component || !req.body.experiment_id){
+    if (!req.body.component || !req.body.experiment_id) {
       log.error("Trying to set a component id withput component name or experiment id");
       res.status(404).send();
       return;
@@ -648,16 +641,16 @@
     res.status(200).send();
   };
 
-  Controller.prototype.getComponentName = function(req, res){
+  Controller.prototype.getComponentName = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
     log.info(req.query);
     var experiment_id = req.query.experiment_id;
-    if (!experiment_id){
+    if (!experiment_id) {
       res.status(404).send();
-      return ;
+      return;
     }
-    res.status(200).send({component_name: DATA_CACHE.security[experiment_id]});
+    res.status(200).send({ component_name: DATA_CACHE.security[experiment_id] });
   }
-  
+
   module.exports = exports = Controller;
 })();
