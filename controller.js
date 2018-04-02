@@ -256,11 +256,11 @@
           var ref=body["Time Series (Daily)"];
           for (date in ref){
             var info = {
-              Open: ref[date]["1. open"],
-              High: ref[date]["2. high"],
-              Low: ref[date]["3. low"],
-              Close: ref[date]["4. close"],
-              Volume: ref[date]["5. volume"],
+              Open: parseFloat(ref[date]["1. open"]),
+              High: parseFloat(ref[date]["2. high"]),
+              Low: parseFloat(ref[date]["3. low"]),
+              Close: parseFloat(ref[date]["4. close"]),
+              Volume: parseFloat(ref[date]["5. volume"]),
               Date: date,
               Symbol: symbol
             };
