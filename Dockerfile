@@ -7,3 +7,7 @@ WORKDIR /proxy
 COPY . /proxy
 RUN npm i
 EXPOSE 4444
+# Sync clock
+RUN echo "Europe/Madrid" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+

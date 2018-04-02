@@ -1,0 +1,9 @@
+{
+  "port": "4444",
+  "log_level": "info",
+  "host": "0.0.0.0",
+  "ssl_key": "./ssl/ssl.key",
+  "ssl_cert": "./ssl/ssl.crt",
+  "ca": "./ssl/ca.crt",
+  "pwd": "my-password"
+}

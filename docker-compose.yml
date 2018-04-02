@@ -9,7 +9,6 @@ services:
       - /home/miguel/proxy-post-logs/:/proxy/logs
     ports:
       - 4444:4444
-    restart: always
     command: [ "node", "app.js" ]
   private-bower:
     image: 'tandrup/private-bower'
@@ -17,6 +16,7 @@ services:
       - 5555:5678
       - 6789:6789
       - 7891:7891
-    restart: always
+    environment:
+      - ADDRESS=http://centauro.ls.fi.upm.es
     volumes:
       - ./data:/data

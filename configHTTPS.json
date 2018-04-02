@@ -1,7 +1,0 @@
-{
-  "port": "4444",
-  "log_level": "info",
-  "host": "0.0.0.0",
-  "ssl_key": "./ssl/key.pem",
-  "ssl_cert": "./ssl/cert.pem"
-}

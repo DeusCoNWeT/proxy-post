@@ -1,2 +1,5 @@
 [2017-09-05 09:19:37.273] [INFO] app - hola
 [2017-09-05 09:19:37.417] [INFO] app - Proxy working at port 4444 over HTTP
+[2017-12-04 13:00:51.080] [INFO] app - Proxy working at port 4444 over HTTPS
+[2017-12-04 13:19:18.577] [INFO] app - Proxy working at port 4444 over HTTPS
+[2017-12-04 13:21:32.507] [INFO] app - Proxy working at port 4444 over HTTPS

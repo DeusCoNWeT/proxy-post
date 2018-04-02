@@ -2,6 +2,81 @@
     "facebook-wall": {
         "name": "facebook-wall",
         "url": "https://github.com/Mortega5/facebook-wall.git",
+        "hits": 6
+    },
+    "finance-historical": {
+        "name": "finance-historical",
+        "url": "https://github.com/Mortega5/finance-historical.git",
+        "hits": 29
+    },
+    "traffic-incidents": {
+        "name": "traffic-incidents",
+        "url": "https://github.com/Mortega5/traffic-incidents.git",
+        "hits": 3
+    },
+    "spotify-login": {
+        "name": "spotify-login",
+        "url": "https://github.com/magasuan/spotify-login.git",
+        "hits": 13
+    },
+    "spotify-component": {
+        "name": "spotify-component",
+        "url": "https://github.com/magasuan/spotify-component.git",
+        "hits": 6
+    },
+    "finance-search": {
+        "name": "finance-search",
+        "url": "https://github.com/Mortega5/finance-search.git",
+        "hits": 10
+    },
+    "pinterest-timeline": {
+        "name": "pinterest-timeline",
+        "url": "https://github.com/Mortega5/pinterest-timeline.git",
         "hits": 0
+    },
+    "open-weather": {
+        "name": "open-weather",
+        "url": "https://github.com/Mortega5/open-weather.git",
+        "hits": 1
+    },
+    "googleplus-timeline": {
+        "name": "googleplus-timeline",
+        "url": "https://github.com/ailopera/googleplus-timeline.git",
+        "hits": 5
+    },
+    "twitter-timeline": {
+        "name": "twitter-timeline",
+        "url": "https://github.com/JuanFryS/twitter-timeline.git",
+        "hits": 2
+    },
+    "search-company": {
+        "name": "search-company",
+        "url": "https://github.com/Mortega5/search-company.git",
+        "hits": 2
+    },
+    "finance-chart": {
+        "name": "finance-chart",
+        "url": "https://github.com/Mortega5/finance-chart.git",
+        "hits": 5
+    },
+    "finance-value": {
+        "name": "finance-value",
+        "url": "https://github.com/Mortega5/finance-value.git",
+        "hits": 2
+    },
+    "reddit-timeline": {
+        "name": "reddit-timeline",
+        "url": "https://github.com/Mortega5/reddit-timeline.git",
+        "hits": 1
+    },
+    "reddit-login": {
+        "name": "reddit-login",
+        "url": "https://github.com/Mortega5/reddit-login.git",
+        "hits": 1
+    },
+    "star-rate": {
+        "name": "star-rate",
+        "url": "https://github.com/Mortega5/star-rate.git",
+        "hits": 3
     }
 }

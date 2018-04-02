@@ -235,40 +235,44 @@
   /************************* STOCK **************************/
   // Stock
 
-  var makeStockRequest = function (query, cb) {
-    var encodedQuery = encodeURIComponent(query);
-    var url = 'https://query.yahooapis.com/v1/public/yql?q=' + encodedQuery + '&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=Callback';
-    getJsonFromJsonP(url, function (err, data) {
-      if (!err && !data.error) {
-        var quote = data.query.results.quote;
-        if (!(quote instanceof Array)) {
-          quote = [quote];
-        }
-        log.debug(data.query.results.quote);
-        // Load data from cache
-        quote.forEach(function (enterprise, index) {
-          var symbol = enterprise.symbol;
-          if (DATA_CACHE.stock[symbol]) {
-            // fill with cache data
-            quote[index] = extend(enterprise, DATA_CACHE.stock[symbol]);
-          }
-        });
-        data.query.results.quote = quote;
+  var makeStockRequest = function (symbol, cb) {
+    var url = 'https://finance.google.com/finance/historical'
+    var params = {
+      q: symbol,
+      output: "csv",
+      histperiod: "daily",
+      startdate: new Date(new Date() - 60*60*24*1000)
+    };
+
+    request({ uri: url, qs: params }, function (err, response, body) {
+      if (err) {
+        log.info(err);
+        cb(err, null);
+      } else {
+        var output = {};
+        csv().fromString(body).on('json', function (data) {
+          data.Date = Date.parse(data.Date);
+          output = data;
+        }).on('done', function () {
+          !output.Date ? cb(body, null): cb(null, output);
+        }.bind(this))
       }
-      cb(err, data);
     });
   };
 
   Controller.prototype.getStock = function (req, res) {
     log.info(req.method + " to " + decodeURIComponent(req.originalUrl) + " from " + req.ip);
-
-    makeStockRequest(req.query.q, function (err, data) {
-      if (err || data.error) {
-        res.status(400).send(err || data);
-        return;
-      }
-      res.status(200).send(data);
-    });
+    if (!req.query.symbol){
+      res.status(400).send({error: "Symbol is required"})
+    } else {
+      makeStockRequest(req.query.symbol, function (err, data) {
+        if (err || data.error) {
+          res.status(400).send(err || data);
+          return;
+        }
+        res.status(200).send(data);
+      });
+    }
   };
 
   Controller.prototype.postStock = function (req, res) {
@@ -374,14 +378,12 @@
   // search company symbol
   Controller.prototype.searchCompany = function (req, res) {
     log.info(req.method + " to " + req.originalUrl + " from " + req.ip);
-    var url = "http://d.yimg.com/autoc.finance.yahoo.com/autoc?lang=es&region=US&query="
+    var url ="https://finance.google.com/finance/match?matchtype=matchall&q="
     url += req.query.q;
     request({ url: url }, function (err, response, body) {
       if (err) {
         res.status(response.statusCode).send(err);
       } else {
-        // Remove warning
-	log.info(body);
         body = JSON.parse(body);
         res.status(response.statusCode).send(body);
       }
@@ -565,12 +567,13 @@
     var symbol = req.query.symbol;
     var start_date = req.query.start_date;
     var end_date = req.query.end_date;
-    if (!start_date || !end_date || !symbol) {
+    if ( (start_date && !end_date) || !symbol) {
       res.status(400).send({ error: "start_date, end_date and symbol must be defined" });
       return;
     }
-
-    var url = 'https://www.google.com/finance/historical'
+    if (!start_date) start_date= new Date();
+    if (!end_date) end_date= new Date();
+    var url = 'https://finance.google.com/finance/historical'
     var params = {
       q: symbol,
       histperiod: "daily",
@@ -580,7 +583,7 @@
     };
     request({ url: url, qs: params }, function (err, response, body) {
       if (err) {
-        res.status(response.statusCode).send(err);
+        res.status(400).send(err);
         return;
       }
       var output = [];

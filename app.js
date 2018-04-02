@@ -25,7 +25,8 @@ var DEFAULT_SETTINGS = {
   "log_level": process.env.LOG_LEVEL || "info",
   "ssl_cert" : process.env.SSL_CERT | "",
   "ssl_key" : process.env.SSL_KEY | "",
-  "log_file": process.env.LOG_FILE | "logs/proxy-post.log"
+  "log_file": process.env.LOG_FILE | "logs/proxy-post.log",
+  "ca": process.env.CA | ""
 };
 CONF = extend({},DEFAULT_SETTINGS, CONF_FILE);
 
@@ -39,6 +40,7 @@ logger.setLevel(CONF.log_level);
 
 // Config express
 var app = express();
+app.use(log4js.connectLogger(logger, {level: CONF.log_level, format: ':method :url :status :response-time ms'}));
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
@@ -58,7 +60,9 @@ if (CONF.ssl_cert && CONF.ssl_key) {
   options = {
     key: fs.readFileSync(CONF.ssl_key),
     cert: fs.readFileSync(CONF.ssl_cert),
-    requestCert:false,
+    ca: fs.readFileSync(CONF.ca),
+    passphrase: CONF.pwd,
+    requestCert: true,
     rejectUnauthorized: false
   };
   https.createServer(options, app).listen(CONF.port, CONF.host, function(){
